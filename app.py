@@ -2,7 +2,9 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-from components import navbar 
+from components import navbar
+import streamlit.components.v1 as st_components
+
 
 # Configuración de la página
 st.set_page_config(
@@ -12,76 +14,227 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS personalizado
+# CSS personalizado mejorado
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.5rem;
-        color: #1a5276;
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-    .sub-header {
-        font-size: 1.5rem;
-        color: #2e86c1;
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-    .section-title {
-        color: #1a5276;
-        border-bottom: 3px solid #f39c12;
-        padding-bottom: 0.5rem;
-        margin: 2rem 0 1rem 0;
-    }
-    .news-card {
-        background-color: #f8f9f9;
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 4px solid #1a5276;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .event-card {
-        background-color: #fff8e1;
-        padding: 1.2rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        border: 1px solid #f39c12;
-    }
-    .important-card {
-        background: linear-gradient(135deg, #1a5276, #2e86c1);
-        color: white;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin: 1rem 0;
-    }
-    .footer {
-        background-color: #1a5276;
-        color: white;
-        padding: 2rem;
-        text-align: center;
-        margin-top: 3rem;
-        border-radius: 10px 10px 0 0;
-    }
-    .mission-vision {
-        background-color: #e8f4f8;
-        padding: 1.5rem;
-        border-radius: 10px;
-        border-left: 4px solid #f39c12;
-        margin: 1rem 0;
-    }
+:root{
+  --primary: #1a365d;
+  --primary-light: #2d5a8c;
+  --primary-dark: #0f1f36;
+  --accent: #f39c12;
+  --accent-dark: #d68910;
+  --success: #27ae60;
+  --danger: #e74c3c;
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #1a1a1a;
+  --text-light: #555555;
+  --border-color: #e0e0e0;
+  --nav-height: 100px;
+}
+
+.stApp {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 1.5rem;
+  padding-top: calc(var(--nav-height) + 80px);
+}
+
+/* Headers */
+.main-header {
+  font-size: 2.5rem;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.sub-header {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+/* Section title */
+.section-title {
+  color: var(--primary);
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 10px;
+  margin: 2rem 0 1.5rem 0;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: -0.3px;
+}
+
+/* Cards */
+.news-card {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent);
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.news-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.news-card h4 {
+  color: var(--primary);
+  margin-top: 0;
+}
+
+.news-card strong {
+  color: var(--accent);
+}
+
+.important-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+  color: var(--text);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border-left: 4px solid var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.important-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.important-card h3 {
+  color: var(--primary);
+  margin-top: 0;
+  font-weight: 700;
+}
+
+/* Mission/Vision */
+.mission-vision {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+  margin: 1.5rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.mission-vision:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.mission-vision h3 {
+  color: var(--primary);
+  margin-top: 0;
+  font-weight: 700;
+}
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  padding: 2.5rem;
+  text-align: center;
+  margin-top: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+}
+
+.footer h3 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.footer p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Buttons (global) */
+.stButton>button {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.stButton>button:hover {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 54, 93, 0.25);
+}
+
+/* Links (page_link) */
+a[data-testid="stPageLink"] { 
+  color: var(--primary) !important; 
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a[data-testid="stPageLink"]:hover {
+  color: var(--accent) !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+  background-color: #f0f4f8;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Small helpers */
+.subtle-muted { 
+  color: var(--text-light); 
+  font-size: 0.95rem;
+}
+
+/* Horizontal line */
+hr {
+  border-color: var(--border-color);
+  margin: 2rem 0;
+}
+
+/* Subheader */
+.stMarkdown h2 {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.stMarkdown h3 {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Data tables */
+.stDataFrame {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # 🔥 Navbar
 current_page = navbar()
 
-# Header
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:
-    st.markdown("<h1 class='main-header'>Escuela Secundaria Federal</h1>", unsafe_allow_html=True)
-    st.markdown("<h2 class='sub-header'>Benemérito de las Américas</h2>", unsafe_allow_html=True)
-    st.markdown("<h5 class='sub-header'>Formando jóvenes con valores y excelencia académica</h5>", unsafe_allow_html=True)
+# (Header moved into the sticky navbar to show on every page)
+st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
 # Menú de navegación
 #menu = st.selectbox("Navegación", 
@@ -105,13 +258,54 @@ with col1:
     - Matutino: 7:00 - 13:00 hrs
     - Vespertino: 14:00 - 20:00 hrs
     """)
-    
-    if st.button("📋 Solicitar Informes", type="primary"):
-        st.success("¡Próximamente podrás solicitar informes en línea!")
      
 with col2:
-    #st.image("imgs/80-aniversario.jpg", width=300)
-    st.image("imgs/baile.webp", width=300)
+    carousel_html = """
+    <style>
+    .carousel { position: relative; overflow: hidden; border-radius: 12px; }
+    .carousel .slides { display: flex; transition: transform 0.5s ease; }
+    .carousel .slide { min-width: 100%; border-radius: 10px; overflow: hidden; }
+    .carousel img { width: 100%; height: 320px; object-fit: cover; display:block; }
+    .carousel .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display:flex; justify-content:space-between; pointer-events:none; padding: 0 0.5rem; }
+    .carousel .nav button { pointer-events:auto; background: rgba(255,255,255,0.92); border:none; padding:0.4rem 0.7rem; border-radius:6px; margin:0 0.5rem; box-shadow:0 6px 18px rgba(11,37,70,0.08); cursor:pointer; font-size:18px; }
+    .carousel .dots { text-align:center; margin-top:0.5rem; }
+    .carousel .dot { display:inline-block; width:10px; height:10px; background:#ddd; border-radius:50%; margin:0 4px; cursor:pointer; }
+    .carousel .dot.active { background: var(--primary); width:12px; height:12px; }
+    </style>
+    <div class="carousel" id="carousel">
+      <div class="slides" id="slides">
+        <div class="slide"><img src="imgs/baile.webp" alt="Imagen 1" /></div>
+        <div class="slide"><img src="imgs/80-aniversario.jpg" alt="Imagen 2" /></div>
+      </div>
+      <div class="nav">
+        <button id="prev">&#10094;</button>
+        <button id="next">&#10095;</button>
+      </div>
+      <div class="dots" id="dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+      </div>
+    </div>
+    <script>
+    const slides = document.getElementById('slides');
+    const dots = document.querySelectorAll('#dots .dot');
+    let index = 0;
+    function update() {
+      slides.style.transform = 'translateX(' + (-index * 100) + '%)';
+      dots.forEach(d => d.classList.remove('active'));
+      dots[index].classList.add('active');
+    }
+    document.getElementById('prev').addEventListener('click', () => { index = (index - 1 + 2) % 2; update(); });
+    document.getElementById('next').addEventListener('click', () => { index = (index + 1) % 2; update(); });
+    dots.forEach(d => d.addEventListener('click', e => { index = parseInt(e.target.dataset.index); update(); }));
+    // Touch support
+    let startX = 0;
+    slides.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; });
+    slides.addEventListener('touchend', (e) => { const dx = e.changedTouches[0].clientX - startX; if (dx < -50) { index = (index + 1) % 2; update(); } else if (dx > 50) { index = (index -1 +2) %2; update(); } });
+    </script>
+    """
+
+    st_components.html(carousel_html, height=380, scrolling=False)
 
 # Tarjetas importantes
 st.markdown("<h2 class='section-title'>📢 Información Importante</h2>", unsafe_allow_html=True)
@@ -232,22 +426,13 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.subheader("📚 Académico")
     st.page_link("pages/ofertas.py", label="Plan de Estudios")
-    #st.page_link("pages/2_📋_Calificaciones.py", label="Sistema de Calificaciones")
-    #st.page_link("pages/3_🏫_Reglamento.py", label="Reglamento Escolar")
-    #st.page_link("pages/4_📅_Calendario.py", label="Calendario Escolar")
 
 with col2:
     st.subheader("👥 Comunidad")
     st.page_link("pages/comunidad.py", label="Generaciones")
-    #st.page_link("pages/6_🎓_Egresados.py", label="Egresados")
-    #st.page_link("pages/7_🤝_Asociaciones.py", label="Asociaciones")
-    #st.page_link("pages/8_💼_Bolsa_Trabajo.py", label="Bolsa de Trabajo")
 
 with col3:
     st.subheader("🌐 Recursos")
-    #st.page_link("pages/9_📖_Biblioteca.py", label="Biblioteca Digital")
-    #st.page_link("pages/10_💻_Plataforma.py", label="Plataforma Educativa")
-    #st.page_link("pages/11_📄_Formatos.py", label="Formatos y Documentos")
     st.page_link("pages/contacto.py", label="Contacto y Ubicación")
 
 # Información de Contacto
@@ -283,7 +468,7 @@ st.map(pd.DataFrame({
 # Footer
 st.markdown("""
 <div class='footer'>
-    <h3>Escuela Secundaria Federal "Benemérito de las Américas"</h3>
+    <h3 style='color: #ffffff;'>Escuela Secundaria Federal "Benemérito de las Américas"</h3>
     <p>© 2023 - Formando jóvenes para un mejor futuro</p>
     <p>Zona Escolar 15, Sector 5 | Todos los derechos reservados</p>
     <p>Pagina diseñada por: M.I. José Alberto Payán Marta</p>

@@ -1,61 +1,36 @@
 # pages/comunidad.py
 import streamlit as st
+import os
 from datetime import datetime
 from components import navbar
+import streamlit.components.v1 as st_components
 
 # 🔥 Navbar
 current_page = navbar()
 
+st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+st.markdown("---")
+
 st.title("👥 Generaciones")
 st.markdown("---")
 
-# CSS personalizado para la galería
+# CSS personalizado para la galería (usa variables globales)
 st.markdown("""
 <style>
-    .gallery-title {
-        color: #1a5276;
-        text-align: center;
-        margin-bottom: 2rem;
-        font-size: 2.5rem;
-    }
-    .generation-card {
-        background: white;
-        border-radius: 15px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border-left: 5px solid #1a5276;
-    }
-    .photo-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-    .photo-item {
-        border-radius: 10px;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
-    .photo-item:hover {
-        transform: scale(1.05);
-    }
-    .year-badge {
-        background: linear-gradient(135deg, #1a5276, #2e86c1);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: bold;
-        display: inline-block;
-        margin-bottom: 1rem;
-    }
-    .stats-card {
-        background: #e8f4f8;
-        padding: 1rem;
-        border-radius: 10px;
-        text-align: center;
-        margin: 0.5rem;
-    }
+    .gallery-title { color: var(--text); text-align:center; margin-bottom:1rem; font-size:2rem; }
+    .generation-card { background: var(--card); border-radius:12px; padding:1rem; margin: 1rem 0; border-left:4px solid var(--primary); }
+    .year-badge { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding:0.4rem 0.8rem; border-radius: 18px; font-weight:700; display:inline-block; margin-bottom:0.5rem; }
+    .stats-card { background: #f8fafc; padding:0.8rem; border-radius:8px; text-align:center; margin:0.5rem; }
+    /* Carousel helpers (mobile-friendly) */
+    .carousel { position: relative; overflow: hidden; border-radius: 10px; }
+    .carousel .slides { display:flex; transition: transform 0.5s ease; }
+    .carousel .slide { min-width:100%; }
+    .carousel img { width:100%; height:320px; object-fit:cover; display:block; border-radius:8px; }
+    .carousel .nav { position:absolute; top:50%; transform:translateY(-50%); width:100%; display:flex; justify-content:space-between; pointer-events:none; padding:0 0.5rem; }
+    .carousel .nav button { pointer-events:auto; background: rgba(255,255,255,0.92); border:none; padding:0.3rem 0.6rem; border-radius:6px; box-shadow:0 6px 18px rgba(11,37,70,0.06); cursor:pointer; }
+    .carousel .dots { text-align:center; margin-top:0.5rem; }
+    .carousel .dot { display:inline-block; width:10px; height:10px; background:#ddd; border-radius:50%; margin:0 4px; cursor:pointer; }
+    .carousel .dot.active { background: var(--primary); width:12px; height:12px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -147,23 +122,55 @@ else:
                 </div>
                 """, unsafe_allow_html=True)
             
-            # Galería de fotos
+            # Galería de fotos (carrusel)
             st.subheader("📷 Galería de Recuerdos")
-            
-            # Mostrar fotos en grid
-            cols = st.columns(3)
-            for i, foto in enumerate(generacion['fotos']):
-                with cols[i % 3]:
-                    # En una app real, usarías st.image(foto['ruta'])
-                    st.markdown(f"""
-                    <div class='photo-item'>
-                        <div style='background: #f0f2f6; padding: 2rem; border-radius: 10px; text-align: center;'>
-                            <span style='font-size: 3rem;'>🖼️</span>
-                            <p style='margin: 0.5rem 0; font-weight: bold;'>{foto['titulo']}</p>
-                            <small>Generación {generacion['año']}</small>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+            slides = []
+            for foto in generacion['fotos']:
+                img_path = foto['ruta']
+                abs_path = os.path.join(os.getcwd(), img_path)
+                if os.path.exists(abs_path):
+                    slides.append(f"<div class='slide'><img src='{img_path}' alt='{foto['titulo']}' /></div>")
+                else:
+                    # Fallback placeholder
+                    slides.append(f"<div class='slide'><div style='height:320px;display:flex;align-items:center;justify-content:center;background:#f0f2f6;border-radius:8px;'><div style='text-align:center;'><span style='font-size:3rem;'>🖼️</span><p style='margin:8px 0 0;font-weight:600;'>{foto['titulo']}</p><small>Generación {generacion['año']}</small></div></div></div>")
+
+            slides_html = "\n".join(slides)
+            carousel_html = f"""
+            <div class='carousel' id='carousel-{generacion['año']}'>
+              <div class='slides' id='slides-{generacion['año']}'>
+                {slides_html}
+              </div>
+              <div class='nav'>
+                <button id='prev-{generacion['año']}'>&#10094;</button>
+                <button id='next-{generacion['año']}'>&#10095;</button>
+              </div>
+              <div class='dots' id='dots-{generacion['año']}'>
+                {''.join([f"<span class='dot {'active' if i==0 else ''}' data-index='{i}'></span>" for i in range(len(slides))])}
+              </div>
+            </div>
+            <script>
+            (function(){{
+              const slides = document.querySelectorAll('#slides-{generacion['año']} .slide');
+              const container = document.getElementById('slides-{generacion['año']}');
+              const dots = document.querySelectorAll('#dots-{generacion['año']} .dot');
+              let index = 0;
+              function update(){{
+                container.style.transform = 'translateX(' + (-index * 100) + '%)';
+                dots.forEach(d => d.classList.remove('active'));
+                if(dots[index]) dots[index].classList.add('active');
+              }}
+              document.getElementById('prev-{generacion['año']}').addEventListener('click', () => {{ index = (index - 1 + slides.length) % slides.length; update(); }});
+              document.getElementById('next-{generacion['año']}').addEventListener('click', () => {{ index = (index + 1) % slides.length; update(); }});
+              dots.forEach(d => d.addEventListener('click', e => {{ index = parseInt(e.target.dataset.index); update(); }}));
+              // touch
+              let startX = 0;
+              container.addEventListener('touchstart', (e) => {{ startX = e.touches[0].clientX; }});
+              container.addEventListener('touchend', (e) => {{ const dx = e.changedTouches[0].clientX - startX; if (dx < -50) {{ index = (index + 1) % slides.length; update(); }} else if (dx > 50) {{ index = (index -1 + slides.length) % slides.length; update(); }} }});
+            }})();
+            </script>
+            """
+
+            st_components.html(carousel_html, height=380, scrolling=False)
             
             # Logros destacados
             with st.expander("🏆 Logros Destacados de esta Generación"):
@@ -221,5 +228,15 @@ st.markdown("""
 <div style='text-align: center; color: #666;'>
     <p>🏫 Escuela Secundaria Federal "Benemérito de las Américas"</p>
     <p>📞 Contacto ex-alumnos: exalumnos@secundariabenemerito.edu.mx</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Footer
+st.markdown("""
+<div class='footer'>
+    <h3>Escuela Secundaria Federal "Benemérito de las Américas"</h3>
+    <p>© 2023 - Formando jóvenes para un mejor futuro</p>
+    <p>Zona Escolar 15, Sector 5 | Todos los derechos reservados</p>
+    <p>Pagina diseñada por: M.I. José Alberto Payán Marta</p>
 </div>
 """, unsafe_allow_html=True)

@@ -6,12 +6,16 @@ from components import navbar
 # 🔥 Navbar
 current_page = navbar()
 
-st.title("📞 Contacto y Ubicación")
+st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+st.markdown("---")
+
+st.markdown("<h2 class='section-title'>📞 Contacto y Ubicación</h2>", unsafe_allow_html=True)
 st.markdown("---")
 
 col1, col2 = st.columns(2)
 
 with col1:
+    st.markdown("<div class='card contact-card'>", unsafe_allow_html=True)
     st.subheader("📋 Información de Contacto")
     
     st.markdown("""
@@ -37,8 +41,10 @@ with col1:
     ⏰ **Horario de Atención:**
     - Lunes a Viernes: 7:00 - 20:00 hrs
     """)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("🗺️ Ubicación")
     st.map(pd.DataFrame({
         'lat': [27.68152],
@@ -51,6 +57,7 @@ with col2:
     - 🚗 **Estacionamiento:** Disponible para visitas
     - ♿ **Acceso para personas con discapacidad:** Sí
     """)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # Personal administrativo
 st.markdown("---")
@@ -66,3 +73,13 @@ personal = {
 
 for puesto, nombre in personal.items():
     st.write(f"**{puesto}:** {nombre}")
+
+# Footer
+st.markdown("""
+<div class='footer'>
+    <h3>Escuela Secundaria Federal "Benemérito de las Américas"</h3>
+    <p>© 2023 - Formando jóvenes para un mejor futuro</p>
+    <p>Zona Escolar 15, Sector 5 | Todos los derechos reservados</p>
+    <p>Pagina diseñada por: M.I. José Alberto Payán Marta</p>
+</div>
+""", unsafe_allow_html=True)

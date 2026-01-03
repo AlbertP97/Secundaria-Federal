@@ -5,14 +5,17 @@ from components import navbar
 # 🔥 Navbar
 current_page = navbar()
 
-st.title("📚 Plan de Estudios")
+st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+st.markdown("---")
+
+st.markdown("<h2 class='section-title'>📚 Plan de Estudios</h2>", unsafe_allow_html=True)
 st.markdown("---")
 
 st.markdown("""
-### Grados que Ofrecemos
-
+<div class='card'>
 Nuestra escuela ofrece educación secundaria en tres grados:
-""")
+</div>
+""", unsafe_allow_html=True)
 
 grados = {
     "Primer Grado": {
@@ -36,9 +39,13 @@ for grado, info in grados.items():
     with st.expander(f"🎓 {grado}"):
         st.write(f"**Materias:** {', '.join(info['materias'])}")
         st.write(f"**Enfoque educativo:** {info['enfoque']}")
-        st.download_button(
-            label=f"Descargar Plan de Estudios - {grado}",
-            data=f"Contenido del plan de estudios {grado}",
-            file_name=f"plan_estudios_{grado.lower().replace(' ', '_')}.pdf",
-            mime="application/pdf"
-        )
+
+# Footer
+st.markdown("""
+<div class='footer'>
+    <h3>Escuela Secundaria Federal "Benemérito de las Américas"</h3>
+    <p>© 2023 - Formando jóvenes para un mejor futuro</p>
+    <p>Zona Escolar 15, Sector 5 | Todos los derechos reservados</p>
+    <p>Pagina diseñada por: M.I. José Alberto Payán Marta</p>
+</div>
+""", unsafe_allow_html=True)
