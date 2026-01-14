@@ -4,6 +4,8 @@ import pandas as pd
 from datetime import datetime
 from components import navbar
 import streamlit.components.v1 as st_components
+import base64
+from pathlib import Path
 
 
 # Configuración de la página
@@ -13,6 +15,14 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# Función para convertir imagen a base64
+def get_base64_image(image_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except:
+        return None
 
 # CSS personalizado mejorado
 st.markdown("""
@@ -260,22 +270,30 @@ with col1:
     """)
      
 with col2:
-    carousel_html = """
+    # Convertir imágenes a base64
+    img1_base64 = get_base64_image("imgs/address_background.jpg")
+    img2_base64 = get_base64_image("imgs/background1.jpg")
+    img3_base64 = get_base64_image("imgs/background2.jpg")
+    img4_base64 = get_base64_image("imgs/background3.jpg")
+    
+    carousel_html = f"""
     <style>
-    .carousel { position: relative; overflow: hidden; border-radius: 12px; }
-    .carousel .slides { display: flex; transition: transform 0.5s ease; }
-    .carousel .slide { min-width: 100%; border-radius: 10px; overflow: hidden; }
-    .carousel img { width: 100%; height: 320px; object-fit: cover; display:block; }
-    .carousel .nav { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display:flex; justify-content:space-between; pointer-events:none; padding: 0 0.5rem; }
-    .carousel .nav button { pointer-events:auto; background: rgba(255,255,255,0.92); border:none; padding:0.4rem 0.7rem; border-radius:6px; margin:0 0.5rem; box-shadow:0 6px 18px rgba(11,37,70,0.08); cursor:pointer; font-size:18px; }
-    .carousel .dots { text-align:center; margin-top:0.5rem; }
-    .carousel .dot { display:inline-block; width:10px; height:10px; background:#ddd; border-radius:50%; margin:0 4px; cursor:pointer; }
-    .carousel .dot.active { background: var(--primary); width:12px; height:12px; }
+    .carousel {{ position: relative; overflow: hidden; border-radius: 12px; background: #f0f0f0; }}
+    .carousel .slides {{ display: flex; transition: transform 0.5s ease; }}
+    .carousel .slide {{ min-width: 100%; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; }}
+    .carousel img {{ width: 100%; height: 320px; object-fit: contain; display:block; }}
+    .carousel .nav {{ position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display:flex; justify-content:space-between; pointer-events:none; padding: 0 0.5rem; }}
+    .carousel .nav button {{ pointer-events:auto; background: rgba(255,255,255,0.92); border:none; padding:0.4rem 0.7rem; border-radius:6px; margin:0 0.5rem; box-shadow:0 6px 18px rgba(11,37,70,0.08); cursor:pointer; font-size:18px; }}
+    .carousel .dots {{ text-align:center; margin-top:0.5rem; }}
+    .carousel .dot {{ display:inline-block; width:10px; height:10px; background:#ddd; border-radius:50%; margin:0 4px; cursor:pointer; }}
+    .carousel .dot.active {{ background: #1a365d; width:12px; height:12px; }}
     </style>
     <div class="carousel" id="carousel">
       <div class="slides" id="slides">
-        <div class="slide"><img src="imgs/baile.webp" alt="Imagen 1" /></div>
-        <div class="slide"><img src="imgs/80-aniversario.jpg" alt="Imagen 2" /></div>
+        <div class="slide"><img src="data:image/jpeg;base64,{img1_base64}" alt="Imagen 1" /></div>
+        <div class="slide"><img src="data:image/jpeg;base64,{img2_base64}" alt="Imagen 2" /></div>
+        <div class="slide"><img src="data:image/webp;base64,{img3_base64}" alt="Imagen 3" /></div>
+        <div class="slide"><img src="data:image/jpeg;base64,{img4_base64}" alt="Imagen 4" /></div>
       </div>
       <div class="nav">
         <button id="prev">&#10094;</button>
@@ -284,24 +302,81 @@ with col2:
       <div class="dots" id="dots">
         <span class="dot active" data-index="0"></span>
         <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
       </div>
     </div>
     <script>
     const slides = document.getElementById('slides');
     const dots = document.querySelectorAll('#dots .dot');
     let index = 0;
-    function update() {
+    let autoplayInterval;
+    
+    function update() {{
       slides.style.transform = 'translateX(' + (-index * 100) + '%)';
       dots.forEach(d => d.classList.remove('active'));
       dots[index].classList.add('active');
-    }
-    document.getElementById('prev').addEventListener('click', () => { index = (index - 1 + 2) % 2; update(); });
-    document.getElementById('next').addEventListener('click', () => { index = (index + 1) % 2; update(); });
-    dots.forEach(d => d.addEventListener('click', e => { index = parseInt(e.target.dataset.index); update(); }));
+    }}
+    
+    function nextSlide() {{
+      index = (index + 1) % 4;
+      update();
+    }}
+    
+    function startAutoplay() {{
+      autoplayInterval = setInterval(nextSlide, 5000); // Cambia cada 5 segundos
+    }}
+    
+    function stopAutoplay() {{
+      clearInterval(autoplayInterval);
+    }}
+    
+    // Iniciar autoplay
+    startAutoplay();
+    
+    // Detener autoplay al interactuar
+    document.getElementById('prev').addEventListener('click', () => {{ 
+      stopAutoplay();
+      index = (index - 1 + 4) % 4; 
+      update(); 
+      startAutoplay(); // Reiniciar autoplay después de 3 segundos
+    }});
+    
+    document.getElementById('next').addEventListener('click', () => {{ 
+      stopAutoplay();
+      index = (index + 1) % 4; 
+      update(); 
+      startAutoplay();
+    }});
+    
+    dots.forEach(d => d.addEventListener('click', e => {{ 
+      stopAutoplay();
+      index = parseInt(e.target.dataset.index); 
+      update(); 
+      startAutoplay();
+    }}));
+    
     // Touch support
     let startX = 0;
-    slides.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; });
-    slides.addEventListener('touchend', (e) => { const dx = e.changedTouches[0].clientX - startX; if (dx < -50) { index = (index + 1) % 2; update(); } else if (dx > 50) { index = (index -1 +2) %2; update(); } });
+    slides.addEventListener('touchstart', (e) => {{ 
+      stopAutoplay();
+      startX = e.touches[0].clientX; 
+    }});
+    slides.addEventListener('touchend', (e) => {{ 
+      const dx = e.changedTouches[0].clientX - startX; 
+      if (dx < -50) {{ 
+        index = (index + 1) % 4; 
+        update(); 
+      }} else if (dx > 50) {{ 
+        index = (index -1 +4) %4; 
+        update(); 
+      }}
+      startAutoplay();
+    }});
+    
+    // Pausar autoplay cuando el mouse está sobre el carrusel
+    document.getElementById('carousel').addEventListener('mouseenter', stopAutoplay);
+    document.getElementById('carousel').addEventListener('mouseleave', startAutoplay);
     </script>
     """
 
@@ -418,6 +493,39 @@ with col2:
     </div>
     """, unsafe_allow_html=True)
 
+# Apoyo con Donaciones
+st.markdown("<h2 class='section-title'>💙 Apoya Nuestra Escuela</h2>", unsafe_allow_html=True)
+
+st.markdown("""
+<div class='important-card'>
+    <h3>🏫 Tu Ayuda Transforma Vidas</h3>
+    <p style='font-size: 1.05rem; line-height: 1.6; margin-bottom: 1rem;'>
+    Cada estudiante que cruza nuestras puertas lleva consigo un sueño, una esperanza de un futuro mejor. 
+    En la Escuela Secundaria Federal "Benemérito de las Américas", trabajamos incansablemente para hacer 
+    realidad esos sueños, pero <strong>necesitamos tu ayuda</strong>.
+    </p>
+    <p style='font-size: 1.05rem; line-height: 1.6; margin-bottom: 1rem;'>
+    Tus donaciones nos permiten mejorar nuestras instalaciones, equipar laboratorios, renovar mobiliario, 
+    adquirir material didáctico y crear espacios dignos donde nuestros jóvenes puedan desarrollar todo su 
+    potencial. <strong>Cada peso cuenta, cada aporte marca la diferencia</strong> en la vida de cientos de 
+    estudiantes que confían en nosotros para construir su futuro.
+    </p>
+    <p style='font-size: 1.05rem; line-height: 1.6; margin-bottom: 1rem;'>
+    No solo estarás ayudando a una escuela, estarás <strong>invirtiendo en el futuro de nuestra comunidad</strong>, 
+    en la educación de los líderes del mañana, en la esperanza de familias que luchan día a día por dar a sus 
+    hijos la mejor preparación posible.
+    </p>
+    <p style='font-size: 1.1rem; font-weight: 600; color: var(--primary); margin-top: 1.5rem;'>
+    🏦 <strong>Cuenta Bancaria para Donaciones:</strong><br>
+    <span style='font-size: 1.15rem; color: var(--accent);'>BBVA Bancomer: 0123 4567 8901 2345</span><br>
+    <span style='font-size: 0.95rem;'>A nombre de: Escuela Secundaria Federal "Benemérito de las Américas"</span>
+    </p>
+    <p style='font-size: 1rem; margin-top: 1rem; font-style: italic; color: var(--text-light);'>
+    ❤️ Gracias por creer en la educación y en nuestros jóvenes. Tu generosidad ilumina su camino.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 # Enlaces Rápidos
 st.markdown("<h2 class='section-title'>🔗 Enlaces Rápidos</h2>", unsafe_allow_html=True)
 
@@ -469,7 +577,7 @@ st.map(pd.DataFrame({
 st.markdown("""
 <div class='footer'>
     <h3 style='color: #ffffff;'>Escuela Secundaria Federal "Benemérito de las Américas"</h3>
-    <p>© 2023 - Formando jóvenes para un mejor futuro</p>
+    <p>© 2026 - Formando jóvenes para un mejor futuro</p>
     <p>Zona Escolar 15, Sector 5 | Todos los derechos reservados</p>
     <p>Pagina diseñada por: M.I. José Alberto Payán Marta</p>
 </div>

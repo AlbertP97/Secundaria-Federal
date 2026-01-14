@@ -36,7 +36,7 @@ st.info("Para dudas o citas: control@secundariabenemerito.edu.mx | Tel: (614) 12
 st.markdown("""
 <div class='footer'>
     <h3>Escuela Secundaria Federal "Benemérito de las Américas"</h3>
-    <p>© 2023 - Formando jóvenes para un mejor futuro</p>
+    <p>© 2026 - Formando jóvenes para un mejor futuro</p>
     <p>Zona Escolar 15, Sector 5 | Todos los derechos reservados</p>
     <p>Pagina diseñada por: M.I. José Alberto Payán Marta</p>
 </div>
